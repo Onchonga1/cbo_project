@@ -1,0 +1,38 @@
+# Virtual environment
+venv/
+.env
+
+# Database
+*.sqlite3
+*.db
+db.sqlite3
+
+# Media files (user uploads)
+media/
+
+# PyCache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

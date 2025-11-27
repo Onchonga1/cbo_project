@@ -1,0 +1,244 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center">Contact Us</h2>
+          <p class="text-center text-muted">
+            Have questions or want to get involved? Send us a message!
+          </p>
+
+          <form id="contact-form">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">Your Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  name="name"
+                  required
+                />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Your Email *</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="subject" class="form-label">Subject *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="subject"
+                name="subject"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="message" class="form-label">Message *</label>
+              <textarea
+                class="form-control"
+                id="message"
+                name="message"
+                rows="5"
+                required
+              ></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="message_type" class="form-label">Message Type</label>
+              <select class="form-select" id="message_type" name="message_type">
+                <option value="general">General Inquiry</option>
+                <option value="support">Support</option>
+                <option value="partnership">Partnership</option>
+                <option value="volunteer">Volunteer Opportunity</option>
+                <option value="donation">Donation</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" id="submit-btn">
+              <span id="submit-text">Send Message</span>
+              <div
+                id="submit-spinner"
+                class="spinner-border spinner-border-sm ms-2"
+                role="status"
+                style="display: none"
+              >
+                <span class="visually-hidden">Sending...</span>
+              </div>
+            </button>
+          </form>
+
+          <div class="mt-4">
+            <h5>Other Ways to Reach Us</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <p><i class="fas fa-envelope me-2"></i>isoelyndon@gmail.com</p>
+                <p><i class="fas fa-phone me-2"></i>+254 798 670 956</p>
+              </div>
+              <div class="col-md-6">
+                <p><i class="fas fa-map-marker-alt me-2"></i>Kisii, Kenya</p>
+                <p>
+                  <i class="fas fa-clock me-2"></i>Mon - Fri: 9:00 AM - 5:00 PM
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-success">
+          <i class="fas fa-check-circle me-2"></i>Success!
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Your message has been sent successfully! We'll get back to you soon.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">
+          <i class="fas fa-exclamation-circle me-2"></i>Error
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p id="error-message">
+          There was an error sending your message. Please try again.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<!-- EmailJS SDK -->
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
+></script>
+
+<script>
+  // Initialize EmailJS with your public key
+  // You need to replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
+  emailjs.init("YOUR_PUBLIC_KEY"); // You'll get this from EmailJS dashboard
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const contactForm = document.getElementById("contact-form");
+    const submitBtn = document.getElementById("submit-btn");
+    const submitText = document.getElementById("submit-text");
+    const submitSpinner = document.getElementById("submit-spinner");
+
+    contactForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      // Show loading state
+      submitText.textContent = "Sending...";
+      submitSpinner.style.display = "inline-block";
+      submitBtn.disabled = true;
+
+      // Get form data
+      const formData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        subject: document.getElementById("subject").value,
+        message: document.getElementById("message").value,
+        message_type: document.getElementById("message_type").value,
+        to_email: "isoelyndon@gmail.com", // Your email address
+      };
+
+      // Send email using EmailJS
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", formData).then(
+        function (response) {
+          console.log("SUCCESS!", response.status, response.text);
+
+          // Show success modal
+          const successModal = new bootstrap.Modal(
+            document.getElementById("successModal")
+          );
+          successModal.show();
+
+          // Reset form
+          contactForm.reset();
+
+          // Reset button state
+          submitText.textContent = "Send Message";
+          submitSpinner.style.display = "none";
+          submitBtn.disabled = false;
+        },
+        function (error) {
+          console.log("FAILED...", error);
+
+          // Show error modal
+          const errorModal = new bootstrap.Modal(
+            document.getElementById("errorModal")
+          );
+          document.getElementById("error-message").textContent =
+            "There was an error sending your message: " +
+            error.text +
+            ". Please try again.";
+          errorModal.show();
+
+          // Reset button state
+          submitText.textContent = "Send Message";
+          submitSpinner.style.display = "none";
+          submitBtn.disabled = false;
+        }
+      );
+    });
+  });
+</script>
+
+<style>
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+  }
+</style>
+{% endblock %}

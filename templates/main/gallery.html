@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Media Gallery</h2>
+    
+    {% if user.is_superuser %}
+        <p class="text-muted">Admin View: Showing all media</p>
+    {% else %}
+        <p class="text-muted">Your Media</p>
+    {% endif %}
+    
+    {% if media_files %}
+    <div class="row">
+        {% for media in media_files %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if media.is_image %}
+                    <img src="{{ media.file.url }}" class="card-img-top" alt="{{ media.title }}" style="height: 250px; object-fit: cover;">
+                {% elif media.is_video %}
+                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls>
+                        <source src="{{ media.file.url }}" type="video/{{ media.file_extension }}">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ media.title|default:"Untitled" }}</h5>
+                    <p class="card-text">{{ media.description }}</p>
+                    <small class="text-muted">
+                        Type: {{ media.get_media_type_display }}<br>
+                        Uploaded by: {{ media.uploaded_by.username }}<br>
+                        {{ media.uploaded_at|date:"M d, Y" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>No media files found.</p>
+        {% if not user.is_authenticated %}
+        <p>Please <a href="{% url 'login' %}">login</a> to see your media.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

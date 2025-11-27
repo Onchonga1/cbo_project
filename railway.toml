@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python manage.py migrate && gunicorn cbo_site.wsgi:application"
+
+[[services]]
+name = "web"
+
+[deploy.healthcheckPath]
+web = "/"

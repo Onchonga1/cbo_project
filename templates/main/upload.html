@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Upload Media</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label class="form-label">Media Type *</label>
+            <div>
+                {% for choice in form.media_type %}
+                <div class="form-check form-check-inline">
+                    {{ choice.tag }}
+                    <label class="form-check-label" for="{{ choice.id_for_label }}">
+                        {{ choice.choice_label }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_file" class="form-label">Choose File *</label>
+            <input type="file" class="form-control" id="id_file" name="file" required>
+            <div class="form-text">
+                <span id="photo-help" style="display: none;">Allowed: JPG, PNG, GIF, BMP, WEBP</span>
+                <span id="video-help" style="display: none;">Allowed: MP4, MOV, AVI, WMV, FLV, WEBM</span>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_title" class="form-label">Title (optional)</label>
+            <input type="text" class="form-control" id="id_title" name="title" placeholder="Enter a title for your media">
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_description" class="form-label">Description (optional)</label>
+            <textarea class="form-control" id="id_description" name="description" rows="3" placeholder="Enter a description"></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Upload Media</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mediaTypeRadios = document.querySelectorAll('input[name="media_type"]');
+    const photoHelp = document.getElementById('photo-help');
+    const videoHelp = document.getElementById('video-help');
+    
+    function updateFileHelp() {
+        const selectedType = document.querySelector('input[name="media_type"]:checked').value;
+        if (selectedType === 'photo') {
+            photoHelp.style.display = 'inline';
+            videoHelp.style.display = 'none';
+        } else {
+            photoHelp.style.display = 'none';
+            videoHelp.style.display = 'inline';
+        }
+    }
+    
+    // Initialize
+    updateFileHelp();
+    
+    // Update on change
+    mediaTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateFileHelp);
+    });
+});
+</script>
+{% endblock %}
